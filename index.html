@@ -6,6 +6,7 @@
 <title>Joaquín Cuevas — Desarrollo web</title>
 <meta name="description" content="Joaquín Cuevas — desarrollo web y de software. Portfolio de proyectos y contacto."/>
 <meta name="theme-color" content="#E4E4E4"/>
+<link rel="preload" as="image" href="assets/hero.jpg"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
@@ -324,41 +325,61 @@ a { color: inherit; }
 }
 @media (min-width: 768px) { .hero { height: 100dvh; min-height: 800px; } }
 
-/* z-index 6 sits above the base image (5) so the masthead actually reads —
-   below the reveal layer (7) so the spotlight sweeps across it. */
+/* El recorte va sobre blanco puro, así que en vez de recortar el fondo se usa
+   mix-blend-mode: multiply — blanco x cualquier color = ese color, o sea que el
+   blanco desaparece contra el fondo de la página sin dejar borde de caja. Como
+   efecto secundario el personaje se oscurece un ~10%, lo que ayuda a que se
+   asiente sobre el gris en vez de flotar encima. */
+.hero-art {
+  position: absolute; z-index: 5;
+  left: 0; right: 0; bottom: 0; top: 40%;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+/* Entrada propia: el zoom con rotación del hero anterior servía para una foto
+   a sangre, pero en una figura recortada se lee como si entrara torcida. */
+@keyframes heroArtIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+.hero-art.hero-image-animate {
+  animation: heroArtIn 1s var(--ease-out) 0.9s forwards;
+}
+@media (min-width: 768px) {
+  .hero-art { top: 56px; left: auto; width: 54%; right: 2%; }
+}
+
+.hero-base-img,
+.hero-reveal-img {
+  position: absolute; inset: 0;
+  background-image: url('assets/hero.jpg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center bottom;
+}
+/* El fondo del JPEG no es blanco puro: mide 249–252. Multiplicado contra el
+   gris de la página da ~224 contra 228, lo que dibuja un rectángulo visible
+   alrededor de la imagen. brightness() lleva esos casi-blancos a 255 para que
+   el multiply los borre del todo; al personaje lo aclara un 4%, imperceptible.
+   Va en las dos capas: la de color es la que se muestra sola en táctil. */
+.hero-base-img   { z-index: 1; filter: grayscale(1) contrast(1.04) brightness(1.04); }
+.hero-reveal-img { z-index: 2; filter: brightness(1.04); }
+
+/* El lettering va por encima del arte. En un hero claro el crema original era
+   invisible, así que pasa a tinta oscura. */
 .hero-big-text {
   position: absolute; bottom: -30px; left: 0; right: 0; z-index: 6;
   pointer-events: none; width: 100%; text-align: center;
 }
 .hero-big-text h2 {
-  font-weight: 500; color: var(--cream); line-height: 0.8;
+  font-weight: 500; color: var(--ink); line-height: 0.8;
   letter-spacing: -0.04em; white-space: nowrap;
-  /* Floor was 180px, which cropped the word down to a single "V" on phones. */
   font-size: clamp(90px, 27vw, 560px);
 }
 @media (min-width: 768px) { .hero-big-text { bottom: -40px; } }
 
-.hero-base-img,
-.hero-reveal-img {
-  position: absolute; top: 30vh; left: 0; right: 0; bottom: 0;
-  background-size: cover; background-repeat: no-repeat;
-  background-position: 60% center;
-  /* Fallback if the remote image fails — degrades to art-directed gradient */
-  background-color: #1b2a30;
-  background-blend-mode: normal;
-}
-.hero-base-img   { z-index: 5; }
-.hero-reveal-img { z-index: 7; pointer-events: none; }
-
-/* Recolours the character's suit from pale blue to black. See the #ink-suit
-   filter near the end of the document for how the matte is derived. */
-.hero-base-img, .hero-reveal-img { filter: url(#ink-suit); }
-@media (min-width: 768px) {
-  .hero-base-img, .hero-reveal-img { top: 0; background-position: center; }
-}
-
-/* Spotlight mask — pure CSS, driven by two custom properties.
-   No per-frame canvas encoding. */
+/* Máscara del spotlight — CSS puro, manejada por dos custom properties.
+   Sin codificar un canvas en cada frame. */
 .hero-reveal-img {
   --mx: 50%;
   --my: 50%;
@@ -373,30 +394,10 @@ a { color: inherit; }
       rgba(0,0,0,0.12) 88%, transparent 100%);
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }
-/* Touch devices have no cursor — hide the layer entirely */
+/* Sin cursor no hay spotlight: se muestra la versión en color directamente. */
 @media (hover: none), (pointer: coarse) {
-  .hero-reveal-img { display: none; }
-}
-
-/* Legibility scrim. The headline is near-black and the artwork behind it is
-   dark, which fails contrast outright. This lifts the ground only where the
-   copy sits and leaves the masthead and subject untouched. */
-.hero-scrim {
-  position: absolute; inset: 0; z-index: 7; pointer-events: none;
-  background: linear-gradient(180deg,
-      rgba(228,228,228,0.96) 0%,
-      rgba(228,228,228,0.92) 30%,
-      rgba(228,228,228,0.45) 44%,
-      rgba(228,228,228,0) 56%);
-}
-@media (min-width: 768px) {
-  .hero-scrim {
-    background: radial-gradient(120% 90% at 0% 22%,
-        rgba(228,228,228,0.96) 0%,
-        rgba(228,228,228,0.82) 30%,
-        rgba(228,228,228,0.30) 55%,
-        rgba(228,228,228,0) 72%);
-  }
+  .hero-base-img   { display: none; }
+  .hero-reveal-img { -webkit-mask-image: none; mask-image: none; }
 }
 
 .hero-content {
@@ -741,7 +742,9 @@ a { color: inherit; }
   }
   .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
   .marquee-track { animation: none; }
-  .hero-reveal-img { display: none; }
+  /* Sin spotlight se muestra la versión en color, no la de base en gris. */
+  .hero-base-img   { display: none; }
+  .hero-reveal-img { -webkit-mask-image: none; mask-image: none; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
@@ -753,35 +756,6 @@ a { color: inherit; }
 <body>
 
 <a class="skip-link" href="#main">Saltar al contenido principal</a>
-
-<!-- Suit recolour filter.
-     The hero art is a remote raster, so the blue is repainted at render time:
-       1. matte — alpha = (B - R), steeply scaled. Isolates the suit, which is
-          the only strongly blue-dominant region. Skin, the gold chain, the
-          flames and the cream X marks are all red-dominant, so they fall out
-          of the matte and pass through untouched.
-       2. ink  — a neutral, darkened copy of the source. Uses luminance
-          coefficients rather than a flat fill so the voxel shading survives;
-          a flat black would flatten the character into a silhouette.
-     The ink is clipped to the matte and drawn back over the original. -->
-<svg width="0" height="0" aria-hidden="true" focusable="false"
-     style="position:absolute;pointer-events:none">
-  <filter id="ink-suit" color-interpolation-filters="sRGB"
-          x="0" y="0" width="100%" height="100%">
-    <feColorMatrix in="SourceGraphic" result="matte" type="matrix" values="
-       0  0  0  0  0
-       0  0  0  0  0
-       0  0  0  0  0
-      -8  0  8  0 -0.45"/>
-    <feColorMatrix in="SourceGraphic" result="ink" type="matrix" values="
-      0.0510 0.1716 0.0173 0 -0.015
-      0.0510 0.1716 0.0173 0 -0.015
-      0.0510 0.1716 0.0173 0 -0.015
-      0      0      0      1  0"/>
-    <feComposite in="ink" in2="matte" operator="in" result="inked"/>
-    <feComposite in="inked" in2="SourceGraphic" operator="over"/>
-  </filter>
-</svg>
 
 <!-- SPLASH -->
 <div class="splash" id="splash" aria-hidden="true">
@@ -852,16 +826,11 @@ a { color: inherit; }
       <h2>Código</h2>
     </div>
 
-    <div class="hero-base-img hero-image-animate"
-         style="background-image:url('https://soft-zoom-63098134.figma.site/_assets/v11/5c9f982199fde1d9b85a20e5396f0fa7bacaf9a3.png?w=2560');"
-         role="img" aria-label="Ilustración 3D de un personaje con traje negro">
+    <div class="hero-art hero-image-animate"
+         role="img" aria-label="Ilustración 3D de una persona sentada en un banquito comiendo pistachos">
+      <div class="hero-base-img" aria-hidden="true"></div>
+      <div class="hero-reveal-img" id="reveal-img" aria-hidden="true"></div>
     </div>
-
-    <div class="hero-reveal-img" id="reveal-img" aria-hidden="true"
-         style="background-image:url('https://soft-zoom-63098134.figma.site/_assets/v11/6be2165e31648955b4e071f4cf2a50bc572b9bfd.png?w=1536');">
-    </div>
-
-    <div class="hero-scrim" aria-hidden="true"></div>
 
     <div class="hero-content">
       <div class="hero-content-inner">
