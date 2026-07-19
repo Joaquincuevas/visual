@@ -19,6 +19,9 @@
   --ink:       #111111;
   --cream:     #F4F1E8;
   --accent:    #75C5DE;
+  /* Mismo matiz, oscurecido para texto sobre fondo claro: el celeste de marca
+     da 1.5:1 sobre --bg y no sirve para texto. Este da 4.7:1. */
+  --accent-deep: #1F6B82;
   --dark:      #0B0B0B;
   --muted:     #5A5A5A;   /* 4.8:1 on --bg */
   --muted-dk:  #9A9590;   /* 6.4:1 on --dark */
@@ -128,11 +131,13 @@ a { color: inherit; }
   from { opacity: 0; transform: translateY(10px); filter: blur(10px); }
   to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
 }
-/* Sin margin-right: la separación la dan espacios reales en el DOM, para que
-   el titular se lea y se copie como una frase y no como una sola palabra. */
+/* La separación entre palabras la dan espacios reales del marcado, no un
+   margin: así el titular se lee y se copia como una frase, no como una sola
+   palabra corrida. --wd escalona la entrada palabra por palabra. */
 .word-reveal {
   opacity: 0; display: inline-block;
   animation: wordReveal 0.4s ease forwards;
+  animation-delay: calc(1s + var(--wd, 0ms));   /* después del atajo, que lo resetea */
 }
 
 @keyframes slideUpScale {
@@ -382,18 +387,26 @@ a { color: inherit; }
   gap: 30px; width: 100%; pointer-events: auto;
 }
 .hero-headline {
-  font-size: 22px; font-weight: 500; line-height: 1.2;
-  letter-spacing: -0.02em; color: var(--ink); max-width: 447px;
+  font-size: clamp(44px, 6vw, 76px);
+  font-weight: 500; line-height: 1.05;
+  letter-spacing: -0.035em; color: var(--ink);
+  /* En em, no en px: así el corte de línea se mantiene proporcional al tamaño
+     y "producción." siempre cae en su propia línea. */
+  max-width: 6.3em;
   transition: color 0.55s var(--ease);
 }
 .hero.is-lit .hero-headline { color: var(--cream); }
+
+/* El acento del titular cambia de tono con el estado: sobre claro necesita la
+   versión profunda para ser legible, sobre negro el celeste de marca rinde. */
+.hero-headline .hl { color: var(--accent-deep); transition: color 0.55s var(--ease); }
+.hero.is-lit .hero-headline .hl { color: var(--accent); }
 @media (min-width: 768px) {
   .hero-content {
     position: absolute; inset: 0;
     justify-content: space-between;
     padding: 160px var(--pad) 100px;
   }
-  .hero-headline { font-size: 28px; }
 }
 
 /* ============================================================
@@ -802,7 +815,13 @@ a { color: inherit; }
 
     <div class="hero-content">
       <div class="hero-content-inner">
-        <h1 class="hero-headline" id="hero-headline"></h1>
+        <h1 class="hero-headline" id="hero-headline">
+          <span class="word-reveal">De</span>
+          <span class="word-reveal" style="--wd:60ms">la</span>
+          <span class="word-reveal" style="--wd:120ms">idea</span>
+          <span class="word-reveal" style="--wd:180ms">a</span>
+          <span class="word-reveal hl" style="--wd:240ms">producción.</span>
+        </h1>
         <a class="cta-btn cta-animate" href="#contact">
           <span class="cta-btn-bg"></span>
           <span class="cta-btn-text">Trabajemos juntos</span>
@@ -1010,20 +1029,6 @@ a { color: inherit; }
 
   /* ---------- Current year ---------- */
   document.getElementById('year').textContent = new Date().getFullYear();
-
-  /* ---------- Hero headline word reveal ---------- */
-  (function headline() {
-    var el = document.getElementById('hero-headline');
-    var text = 'Construyo sitios y aplicaciones web, de la idea al código en producción.';
-    text.split(' ').forEach(function (word, i) {
-      var span = document.createElement('span');
-      span.className = 'word-reveal';
-      span.textContent = word;
-      span.style.animationDelay = (1 + i * 0.05) + 's';
-      el.appendChild(span);
-      el.appendChild(document.createTextNode(' '));
-    });
-  })();
 
   /* ---------- Menu ---------- */
   (function menu() {
