@@ -31,7 +31,7 @@ El menú navega a las secciones reales de la página.
 
 **Las portadas de los proyectos** son arte compuesto en CSS — gradientes en capas más una textura de grano por SVG. Las clases van de `art-1` a `art-6`. No hay imágenes que cargar ni que se puedan romper.
 
-**El hero tiene dos estados.** En reposo es claro y el personaje va en gris; al entrar el puntero se invierte a negro, el personaje pasa a color saturado, el titular a crema y el lettering al celeste de marca. Todo el cambio son cuatro propiedades animadas más un resplandor que sigue al cursor para que el negro no quede plano. Sin elementos extra.
+**El hero tiene dos estados.** En reposo es claro y el personaje va en gris; al entrar el puntero se invierte a negro, el personaje pasa a color saturado y el titular a crema. Todo el cambio son tres propiedades animadas más un resplandor que sigue al cursor para que el negro no quede plano. Sin elementos extra.
 
 **El recorte lleva transparencia real** (`assets/hero.webp`), y eso es lo que hace posible el estado oscuro. La versión anterior usaba `mix-blend-mode: multiply` para borrar el fondo blanco, pero multiply sobre negro habría hecho desaparecer al personaje: cualquier color por negro da negro.
 

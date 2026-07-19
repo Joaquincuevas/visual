@@ -141,12 +141,6 @@ a { color: inherit; }
 }
 .cta-animate { opacity: 0; animation: slideUpScale 0.8s var(--ease) 1s forwards; }
 
-@keyframes creatorSlideUp { from { transform: translateY(330px); } to { transform: translateY(0); } }
-.creator-text-animate {
-  transform: translateY(330px);
-  animation: creatorSlideUp 1s var(--ease-out) 1.5s forwards;
-}
-
 /* Scroll-triggered reveal */
 .reveal {
   opacity: 0;
@@ -369,22 +363,6 @@ a { color: inherit; }
 .hero-art.hero-image-animate {
   animation: heroArtIn 1s var(--ease-out) 0.9s forwards;
 }
-
-/* El lettering va por encima del arte y cambia de tinta al celeste de marca:
-   es el único elemento que cambia de matiz, para que el golpe de color se lea
-   como una decisión y no como ruido. */
-.hero-big-text {
-  position: absolute; bottom: -30px; left: 0; right: 0; z-index: 6;
-  pointer-events: none; width: 100%; text-align: center;
-}
-.hero-big-text h2 {
-  font-weight: 500; color: var(--ink); line-height: 0.8;
-  letter-spacing: -0.04em; white-space: nowrap;
-  font-size: clamp(90px, 27vw, 560px);
-  transition: color 0.55s var(--ease);
-}
-.hero.is-lit .hero-big-text h2 { color: var(--accent); }
-@media (min-width: 768px) { .hero-big-text { bottom: -40px; } }
 
 /* Sin cursor no hay estado oscuro posible, así que se muestra el personaje en
    color sobre el fondo claro. */
@@ -729,7 +707,7 @@ a { color: inherit; }
   html { scroll-behavior: auto; }
   .splash { animation: splashHide 0.01s linear forwards; }
   .splash-box { animation: none !important; }
-  .hero-image-animate, .word-reveal, .cta-animate, .creator-text-animate {
+  .hero-image-animate, .word-reveal, .cta-animate {
     animation: none !important; opacity: 1 !important;
     transform: none !important; filter: none !important;
   }
@@ -737,7 +715,7 @@ a { color: inherit; }
   .marquee-track { animation: none; }
   /* El cambio claro/oscuro es de color, no de movimiento, así que se conserva;
      lo que se quita es la transición y el resplandor que sigue al cursor. */
-  .hero, .hero-art, .hero-headline, .hero-big-text h2 { transition: none !important; }
+  .hero, .hero-art, .hero-headline { transition: none !important; }
   .hero-glow { display: none; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -816,10 +794,6 @@ a { color: inherit; }
 
   <!-- ==================== HERO ==================== -->
   <section class="hero" aria-labelledby="hero-headline">
-    <div class="hero-big-text creator-text-animate" aria-hidden="true">
-      <h2>Código</h2>
-    </div>
-
     <div class="hero-glow" id="hero-glow" aria-hidden="true"></div>
 
     <div class="hero-art hero-image-animate"
