@@ -319,14 +319,23 @@ a { color: inherit; }
 /* ============================================================
    HERO
    ============================================================ */
-/* El hero muestra la versión clara del personaje. El puntero actúa de linterna:
-   revela, solo dentro de un círculo, una segunda foto del mismo personaje sobre
-   fondo negro. Son dos imágenes distintas, no un filtro. */
+/* El hero muestra la versión clara del personaje. Al entrar el puntero pasan dos
+   cosas a la vez: el hero entero se pinta de negro, y una linterna revela dentro
+   de un círculo una segunda foto del mismo personaje. Son dos imágenes
+   distintas, no un filtro.
+
+   El fondo entero tiene que oscurecerse, no solo el círculo: la foto oscura trae
+   su propio fondo negro y, sobre una página clara, ese fondo se recorta como un
+   rectángulo. Con la página también negra los dos se funden y solo se ve
+   transformarse al personaje. --dark coincide con la mediana del fondo de la
+   foto (11), medida en tools/alinear.py. */
 .hero {
   position: relative; width: 100%; overflow: hidden;
   background-color: var(--bg); min-height: 100dvh;
+  transition: background-color 0.5s var(--ease);
 }
 @media (min-width: 768px) { .hero { height: 100dvh; min-height: 800px; } }
+.hero.is-lit { background-color: var(--dark); }
 
 /* Las dos capas comparten lienzo (840x935) y el personaje está alineado por la
    cabeza entre ambas, así el revelado no salta. La alineación se calcula en
@@ -398,11 +407,15 @@ a { color: inherit; }
   /* En em, no en px: así el corte de línea se mantiene proporcional al tamaño
      y "producción." siempre cae en su propia línea. */
   max-width: 6.3em;
+  transition: color 0.5s var(--ease);
 }
+.hero.is-lit .hero-headline { color: var(--cream); }
 
-/* El celeste de marca da 1.5:1 sobre el fondo claro y no sirve para texto;
-   esta es la versión oscurecida del mismo matiz, 4.7:1. */
-.hero-headline .hl { color: var(--accent-deep); }
+/* El celeste de marca da 1.5:1 sobre el fondo claro y no sirve para texto: en
+   claro va la versión oscurecida del mismo matiz (4.7:1) y sobre negro el
+   celeste de marca, que ahí rinde 10.1:1. */
+.hero-headline .hl { color: var(--accent-deep); transition: color 0.5s var(--ease); }
+.hero.is-lit .hero-headline .hl { color: var(--accent); }
 @media (min-width: 768px) {
   .hero-content {
     position: absolute; inset: 0;
@@ -1092,9 +1105,11 @@ a { color: inherit; }
 
     hero.addEventListener('pointerenter', function () {
       measure();
+      hero.classList.add('is-lit');            // el hero entero se va a negro
       capa.style.setProperty('--mr', RADIO + 'px');
     });
     hero.addEventListener('pointerleave', function () {
+      hero.classList.remove('is-lit');
       capa.style.setProperty('--mr', '0px');   // la linterna se apaga al salir
     });
 

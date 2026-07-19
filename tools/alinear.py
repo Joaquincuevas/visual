@@ -28,6 +28,9 @@ from PIL import Image
 
 W, H = 840, 935          # lienzo común
 CAB_X, CAB_TOP = 420, 20  # dónde queda la cabeza dentro del lienzo
+# Tiene que ser exactamente --dark del CSS: al pasar el mouse el hero entero se
+# pone de ese color, y si la capa no coincide su rectángulo se nota.
+NEGRO = (11, 11, 11)
 
 
 def geometria(mask):
@@ -58,12 +61,20 @@ def alinear(ruta_clara, ruta_oscura):
     # Oscura: escalada y desplazada, sobre un fondo negro que llena el lienzo
     o2 = oscura.resize((round(oscura.width * esc), round(oscura.height * esc)),
                        Image.LANCZOS)
-    osc = Image.new('RGB', (W, H), (8, 8, 8))
+    osc = Image.new('RGB', (W, H), NEGRO)
     osc.paste(o2, (CAB_X - round(cx_o * esc), CAB_TOP - round(top_o * esc)))
 
     luz.save('assets/hero-light.webp', quality=88, method=6)
     osc.save('assets/hero-dark.webp', quality=88, method=6)
+
+    # Al pasar el mouse el hero entero se pinta del mismo negro que esta capa; si
+    # no coinciden, su rectángulo se nota. Sin pérdida no ayuda: medido, el
+    # desvío en el fondo es de 3 niveles tanto en calidad 88 como en 100, así que
+    # no vale 6x el peso. Lo que importa es que el CSS use el valor real.
+    negro = np.array(Image.open('assets/hero-dark.webp').convert('RGB'))[:900, :60]
     print(f"  assets/hero-light.webp y assets/hero-dark.webp  {W}x{H}")
+    print(f"  negro del fondo: mediana {int(np.median(negro))}  "
+          f"-> el CSS debe usar #" + f"{int(np.median(negro)):02x}" * 3)
 
 
 if __name__ == '__main__':

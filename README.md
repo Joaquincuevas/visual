@@ -31,7 +31,9 @@ El menú navega a las secciones reales de la página.
 
 **Las portadas de los proyectos** son arte compuesto en CSS — gradientes en capas más una textura de grano por SVG. Las clases van de `art-1` a `art-6`. No hay imágenes que cargar ni que se puedan romper.
 
-**El hero usa dos fotos distintas del mismo personaje.** En reposo se ve la clara, sobre el fondo de la página. El puntero actúa de linterna: dentro de un círculo revela la segunda foto, tomada sobre fondo negro. No es un filtro sobre la misma imagen — son dos capturas con otra ropa, otra pose y otra luz.
+**El hero usa dos fotos distintas del mismo personaje.** En reposo se ve la clara, sobre el fondo de la página. Al entrar el puntero pasan dos cosas a la vez: el hero entero se pinta de negro, y una linterna revela dentro de un círculo la segunda foto. No es un filtro sobre la misma imagen — son dos capturas con otra ropa, otra pose y otra luz.
+
+**El fondo entero tiene que oscurecerse, no solo el círculo.** La foto oscura trae su propio fondo negro y, sobre una página clara, ese fondo se recorta como un rectángulo alrededor del área revelada. Con la página también en negro los dos se funden y solo se ve transformarse al personaje. Por eso `--dark` coincide con la mediana del fondo de la foto, que `tools/alinear.py` mide e informa al generar los assets.
 
 **El recorte claro lleva transparencia real** (`assets/hero-light.webp`), así se apoya sobre el fondo de la página sin caja. La capa oscura, en cambio, conserva su fondo negro a propósito: es lo que hace que dentro del círculo se vea el personaje *y su mundo*, en vez de un recorte flotando.
 
